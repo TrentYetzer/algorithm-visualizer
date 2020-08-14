@@ -22,16 +22,28 @@ export default class App extends Vue {}
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  height: 100vh;
 }
-
 html {
-  overflow-x: hidden;
   margin: 0;
   padding: 0;
 }
 body {
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
+}
+
+@media screen and (min-width: 1301px) {
+  body {
+    overflow-y: hidden;
+  }
+}
+
+@media screen and (max-width: 1300px) {
+  body {
+    overflow-y: scroll;
+  }
 }
 
 h3 {

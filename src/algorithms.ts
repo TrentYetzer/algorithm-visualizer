@@ -1,4 +1,5 @@
 //Returns can be moved since they will not alter the height if sorted by step
+/* eslint-disable */
 
 export function bubbleSort(array: number[]): (string | number)[][] {
   const visualize = [];
@@ -6,6 +7,7 @@ export function bubbleSort(array: number[]): (string | number)[][] {
   for (let i = 0; i < length - 1; i++) {
     for (let j = 0; j < length - i - 1; j++) {
       visualize.push([j, array[j], j + 1, array[j + 1], "compare"]);
+
       if (array[j] > array[j + 1]) {
         visualize.push([j, array[j], j + 1, array[j + 1], "swap"]);
         visualize.push([j, array[j + 1], j + 1, array[j], "swap"]);
@@ -242,11 +244,11 @@ export function timSort(array: number[]): (string | number)[][] {
   //Sorted into blocks known as RUN
   const RUN = 32;
   const length = array.length;
-  for (let i = 0; i < length; i += 32) {
-    insertionSortHelper(array, i, Math.min(i + 31, length - 1), visualize);
+  for (let i = 0; i < length; i += RUN) {
+    insertionSortHelper(array, i, Math.min(i + RUN - 1, length - 1), visualize);
   }
 
-  for (let size = 32; size < length; size = 2 * size) {
+  for (let size = RUN; size < length; size = 2 * size) {
     for (let left = 0; left < length; left += 2 * size) {
       const middle = left + size - 1;
       const right = Math.min(left + 2 * size - 1, length - 1);
@@ -310,6 +312,95 @@ export function quickSortHelper(
 export function quickSort(array: number[]): (string | number)[][] {
   const visualize: (string | number)[][] = [];
   quickSortHelper(array, 0, array.length - 1, visualize);
+  visualize.push([0, 0, 0, 0, "finished"]);
+  return visualize;
+}
+
+export function heapify(
+  array: number[],
+  length: number,
+  index: number,
+  visualize: (string | number)[][]
+): void {
+  let largest = index;
+  const left = 2 * index + 1;
+  const right = 2 * index + 2;
+  if (left < length && array[left] > array[largest]) {
+    visualize.push([largest, array[largest], left, array[left], "compare"]);
+    visualize.push([largest, array[largest], left, array[left], "return"]);
+    largest = left;
+  }
+  if (right < length && array[right] > array[largest]) {
+    visualize.push([largest, array[largest], right, array[right], "compare"]);
+    visualize.push([largest, array[largest], right, array[right], "return"]);
+    largest = right;
+  }
+  if (largest != index) {
+    visualize.push([largest, array[largest], index, array[index], "swap"]);
+    visualize.push([largest, array[index], index, array[largest], "swap"]);
+    visualize.push([largest, array[index], index, array[largest], "return"]);
+    const temp = array[index];
+    array[index] = array[largest];
+    array[largest] = temp;
+    heapify(array, length, largest, visualize);
+  }
+}
+
+export function heapSort(array: number[]): (string | number)[][] {
+  const visualize: (string | number)[][] = [];
+  const length = array.length;
+  for (let i = Math.floor(length / 2 - 1); i >= 0; i--) {
+    heapify(array, length, i, visualize);
+  }
+  for (let i = length - 1; i > 0; i--) {
+    visualize.push([0, array[0], i, array[i], "swap"]);
+    visualize.push([0, array[i], i, array[0], "swap"]);
+    visualize.push([0, array[i], i, array[0], "return"]);
+    const temp = array[0];
+    array[0] = array[i];
+    array[i] = temp;
+
+    heapify(array, i, 0, visualize);
+  }
+  visualize.push([0, 0, 0, 0, "finished"]);
+  return visualize;
+}
+
+export function flip(
+  array: number[],
+  index: number,
+  visualize: (string | number)[][]
+): void {
+  let start = 0;
+  while (start < index) {
+    visualize.push([start, array[start], index, array[index], "swap"]);
+    visualize.push([start, array[index], index, array[start], "swap"]);
+    visualize.push([start, array[index], index, array[start], "return"]);
+    const temp = array[start];
+    array[start] = array[index];
+    array[index] = temp;
+    start++;
+    index--;
+  }
+}
+
+export function pancakeSort(array: number[]): (string | number)[][] {
+  const visualize: (string | number)[][] = [];
+  const length = array.length;
+  for (let i = length; i > 1; --i) {
+    let max = 0;
+    for (let j = 0; j < i; ++j) {
+      visualize.push([j, array[j], max, array[max], "compare"]);
+      visualize.push([j, array[j], max, array[max], "return"]);
+      if (array[j] > array[max]) {
+        max = j;
+      }
+    }
+    if (max != i - 1) {
+      flip(array, max, visualize);
+      flip(array, i - 1, visualize);
+    }
+  }
   visualize.push([0, 0, 0, 0, "finished"]);
   return visualize;
 }

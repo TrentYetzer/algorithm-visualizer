@@ -13,16 +13,20 @@
           <div v-on:click="insertion()">Insertion Sort</div>
           <div v-on:click="tim()">Tim Sort</div>
           <div v-on:click="quick()">Quick Sort</div>
+          <div v-on:click="heap()">Heap Sort</div>
+          <div v-on:click="pancake()">Pancake Sort</div>
         </div>
       </div>
       <div class="slider-container flex column">
         <div class="flex row">
           <p>Less Bars</p>
+          <!-- eslint-disable-next-line -->
           <input type="range" min="1" max="80" v-model="scaleFactor" class="slider" />
           <p>More Bars</p>
         </div>
         <div class="flex row">
           <p>1ms Delay</p>
+          <!-- eslint-disable-next-line -->
           <input type="range" min="1" max="1000" v-model="visualizeSpeed" class="slider" />
           <p>1s Delay</p>
         </div>
@@ -30,6 +34,7 @@
     </div>
     <div class="bars-section">
       <h3 id="current-sort" class="sort-header"></h3>
+      <h6 id="description" class="sort-description"></h6>
       <div class="bars-container">
         <div
           v-for="(item, index) in array"
@@ -115,7 +120,7 @@ export default class Visualizer extends Vue {
 
   insertion(): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.getElementById("current-sort")!.innerText = "Inseertion Sort";
+    document.getElementById("current-sort")!.innerText = "Insertion Sort";
     this.genericAnimation(Algorithm.insertionSort(this.array));
   }
 
@@ -131,13 +136,24 @@ export default class Visualizer extends Vue {
     this.genericAnimation(Algorithm.quickSort(this.array));
   }
 
-  resetAnimations() {
+  heap(): void {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    document.getElementById("current-sort")!.innerText = "";
+    document.getElementById("current-sort")!.innerText = "Heap Sort";
+    this.genericAnimation(Algorithm.heapSort(this.array));
+  }
+
+  pancake(): void {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    document.getElementById("current-sort")!.innerText = "Pancake Sort";
+    this.genericAnimation(Algorithm.pancakeSort(this.array));
+  }
+
+  resetAnimations() {
     const bars = document.getElementsByClassName("bar");
     for (const bar of bars) {
       (bar as HTMLElement).style.backgroundColor = this.PRIMARY;
     }
+    this.clearTimeouts();
   }
 
   finishAnimation() {
@@ -148,10 +164,28 @@ export default class Visualizer extends Vue {
     this.$forceUpdate();
   }
 
+  clearTimeouts(): void {
+    let id = window.setTimeout(function() {
+      //clearing timeout
+    }, 0);
+
+    while (id--) {
+      window.clearTimeout(id); // will do nothing if no timeout with id is present
+    }
+  }
+
   genericAnimation(animations: (string | number)[][]): void {
+    this.resetAnimations();
     for (let i = 0; i < animations.length; i++) {
       const bars = document.getElementsByClassName("bar");
       const [barOne, barOneHeight, barTwo, barTwoHeight, step] = animations[i];
+      // if (step === "description") {
+      //   setTimeout(() => {
+      //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      //     document.getElementById("description")!.innerText = barOne as string;
+      //   }, i * this.visualizeSpeed);
+      //   continue;
+      // }
       const barOneStyle = (bars[barOne as number] as HTMLElement).style;
       const barTwoStyle = (bars[barTwo as number] as HTMLElement).style;
       if (step === "compare") {
@@ -191,7 +225,7 @@ export default class Visualizer extends Vue {
 <style scoped>
 .bars-section {
   position: relative;
-  margin: 1rem;
+  margin: 0rem;
   height: 800px;
   display: flex;
   justify-content: center;
@@ -199,14 +233,21 @@ export default class Visualizer extends Vue {
 }
 
 .sort-header {
-  margin-top: 0;
+  position: absolute;
+  top: -1rem;
+  font-size: 2rem;
+}
+
+.sort-description {
+  position: absolute;
+  bottom: -2rem;
+  font-size: 1rem;
 }
 
 .bars-container {
   position: absolute;
-  top: 3rem;
   width: 100%;
-  bottom: 0;
+  bottom: 2rem;
   display: flex;
   justify-content: center;
   align-items: baseline;
